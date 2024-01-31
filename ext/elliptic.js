@@ -7311,10 +7311,15 @@
     
     if (!isNode) {
         Rand.prototype._rand = function _rand(n) {
-            var arr = new Uint8Array(n);
-            global.crypto.getRandomValues(arr);
-            return arr;
-            };
+          var arr = new Uint8Array(n);
+          self.crypto.getRandomValues(arr);
+          return arr;
+        };
+        // Rand.prototype._rand = function _rand(n) {
+        //     var arr = new Uint8Array(n);
+        //     global.crypto.getRandomValues(arr);
+        //     return arr;
+        //     };
     //   if (self.crypto && self.crypto.getRandomValues) {
     //     // Modern browsers
     //     Rand.prototype._rand = function _rand(n) {
