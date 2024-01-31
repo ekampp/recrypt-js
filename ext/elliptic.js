@@ -7299,56 +7299,27 @@
     Rand.prototype.generate = function generate(len) {
       return this._rand(len);
     };
-    
-    var isNode = false;
-    if (typeof process === 'object') {
-        if (typeof process.versions === 'object') {
-            if (typeof process.versions.node !== 'undefined') {
-                isNode = true;
-            }
-        }
-    }
-    
-    if (!isNode) {
-        Rand.prototype._rand = function _rand(n) {
-          var arr = new Uint8Array(n);
-          self.crypto.getRandomValues(arr);
-          return arr;
-        };
-        // Rand.prototype._rand = function _rand(n) {
-        //     var arr = new Uint8Array(n);
-        //     global.crypto.getRandomValues(arr);
-        //     return arr;
-        //     };
-    //   if (self.crypto && self.crypto.getRandomValues) {
-    //     // Modern browsers
-    //     Rand.prototype._rand = function _rand(n) {
-    //       var arr = new Uint8Array(n);
-    //       self.crypto.getRandomValues(arr);
-    //       return arr;
-    //     };
-    //   } else if (self.msCrypto && self.msCrypto.getRandomValues) {
-    //     // IE
-    //     Rand.prototype._rand = function _rand(n) {
-    //       var arr = new Uint8Array(n);
-    //       self.msCrypto.getRandomValues(arr);
-    //       return arr;
-    //     };
-    //   } else {
-    //     // Old junk
-    //     Rand.prototype._rand = function() {
-    //       throw new Error('Not implemented yet');
-    //     };
-    //   }
-    } else {
-      // Node.js or Web worker with no crypto support
+
+    try {
+      // Modern browsers
+      Rand.prototype._rand = function _rand(n) {
+        var arr = new Uint8Array(n);
+        self.crypto.getRandomValues(arr);
+        return arr;
+      };
+    } catch (e) {
+      console.info("elliptic.js: Not a modern browser", e)
+
       try {
+        // Node.js with crypto support
         var crypto = require('crypto');
-    
+
         Rand.prototype._rand = function _rand(n) {
           return crypto.randomBytes(n);
         };
       } catch (e) {
+        console.info("elliptic.js: Not a Node.js server with crypto support", e)
+
         // Emulate crypto API using randy
         Rand.prototype._rand = function _rand(n) {
           var res = new Uint8Array(n);
